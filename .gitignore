@@ -1,0 +1,5 @@
+
+/.database/
+/src/app/.env
+/database/initdb/
+/.env.example
