@@ -20,27 +20,27 @@ func NewOwnerController(createPracticeUseCase command.CreatePracticeUseCase,
 	return oc
 }
 
+type PracticeMapper struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
 //webフレームワークの情報はなるべくcontroller内に収めないといけない
 //jsonなどの情報はバックとフロントでの通信するためのもののため、controller内に収める。
 func (oc *OwnerController) CreatePractice(c echo.Context) (err error) {
-	type PracticeMapper struct {
-		Id   int    `json:"id"`
-		Name string `json:"name"`
-		Age  int    `json:"age"`
-	}
+
 	var mapperPractice PracticeMapper
 	err = c.Bind(&mapperPractice)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	//entityの生成(usecaseで作成したいが、PracticeMapperを引数で渡してしまうためcontrollerで生成。)
 	practice := *entity.NewPractice(0, mapperPractice.Name, mapperPractice.Age)
 	err = oc.createPracticeUseCase.Invoke(practice)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, practice)
+	return c.JSON(http.StatusCreated, practice)
 }
 
 func (oc *OwnerController) CreateCompany(c echo.Context) (err error) {
