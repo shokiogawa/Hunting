@@ -1,22 +1,22 @@
 package entity
 
 type Company struct {
-	id       int
-	userId   int
-	statusId int
-	name     string
-	detail   string
-	color    CompanyColor
+	Id       int
+	UserId   int
+	StatusId int
+	Name     string
+	Detail   string
+	Color    CompanyColor
 }
 
 func NewCompany(id int, userId int, statusId int, name string, detail string) *Company {
 	company := new(Company)
-	company.id = id
-	company.userId = userId
-	company.statusId = statusId
-	company.name = name
-	company.detail = detail
-	company.color = CompanyColors.Black
+	company.Id = id
+	company.UserId = userId
+	company.StatusId = statusId
+	company.Name = name
+	company.Detail = detail
+	company.Color = CompanyColors.Black
 	return company
 }
 
