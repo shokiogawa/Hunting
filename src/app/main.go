@@ -16,7 +16,9 @@ func main() {
 	}
 	prepo := repository.NewPracticeRepository(*mysql)
 	prusecase := *command.NewCreatePracticeUseCase(prepo)
-	controller := controller2.NewOwnerController(prusecase)
+	crepo := repository.NewCompanyRepository(*mysql)
+	ccuc := *command.NewCreateCompanyUseCase(crepo)
+	controller := controller2.NewOwnerController(prusecase, ccuc)
 	lineController := controller2.NewLineController()
 
 	//echoフレームワーク

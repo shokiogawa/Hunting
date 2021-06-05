@@ -11,12 +11,13 @@ import (
 
 type OwnerController struct {
 	createPracticeUseCase command.CreatePracticeUseCase
+	createCompanyUseCase  command.CreateCompanyUserCase
 }
 
-func NewOwnerController(createPracticeUseCase command.CreatePracticeUseCase,
-) *OwnerController {
+func NewOwnerController(createPracticeUseCase command.CreatePracticeUseCase, createCompanyUseCase command.CreateCompanyUserCase) *OwnerController {
 	oc := new(OwnerController)
 	oc.createPracticeUseCase = createPracticeUseCase
+	oc.createCompanyUseCase = createCompanyUseCase
 	return oc
 }
 
@@ -46,12 +47,13 @@ func (oc *OwnerController) CreatePractice(c echo.Context) (err error) {
 
 func (oc *OwnerController) CreateCompany(c echo.Context) (err error) {
 	userId, err := strconv.Atoi(c.Param("userId"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 	type CompanyMapper struct {
-		id       int    `json:"id"`
-		userId   int    `json:"user_id"`
-		statusId int    `json:"status_id"`
-		name     string `json:"name"`
-		detail   string `json:"detail"`
+		StatusId int    `json:"status_id"`
+		Name     string `json:"name"`
+		Detail   string `json:"detail"`
 	}
 	var mapperCompany CompanyMapper
 	err = c.Bind(&mapperCompany)
@@ -59,9 +61,8 @@ func (oc *OwnerController) CreateCompany(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	company := *entity.NewCompany(mapperCompany.id, userId, mapperCompany.statusId, mapperCompany.name, mapperCompany.detail)
-	fmt.Println(company)
-	//TODO: commandでcompanyを作成。
-	c.JSON(http.StatusOK, "ok")
-	return
+	company := *entity.NewCompany(0, userId, mapperCompany.StatusId, mapperCompany.Name, mapperCompany.Detail)
+	fmt.Println(company.Name)
+	err = oc.createCompanyUseCase.Invoke(company)
+	return c.JSON(http.StatusCreated, company)
 }

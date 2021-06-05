@@ -3,6 +3,7 @@ package repository
 import (
 	"awesomeProject/src/app/domain/entity"
 	"awesomeProject/src/app/infrastructure"
+	"fmt"
 )
 
 type CompanyRepository struct {
@@ -22,9 +23,10 @@ func (cr CompanyRepository) CreateCompany(company entity.Company) (err error) {
 	}
 	query := `INSERT INTO companies(user_id, status_id, name, detail, color)
 VALUE (?,?,?,?,?);`
-	result := db.MustExec(query, company.UserId, company.StatusId, company.Name, company.Detail, company.Color)
+	result := db.MustExec(query, company.UserId, company.StatusId, company.Name, company.Detail, company.Color.String())
 	_, err = result.LastInsertId()
 	if err != nil {
+		fmt.Println("ここでエラー")
 		return
 	}
 	return
