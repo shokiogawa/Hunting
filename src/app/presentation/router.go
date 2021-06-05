@@ -8,10 +8,12 @@ import (
 func NewEchoRouter(controller *controller.OwnerController, lineController *controller.LineController) *echo.Echo {
 	e := echo.New()
 	e.GET("/callback", lineController.LineHandler)
-	e.POST("/practice", controller.CreateCompany)
+	e.POST("/practice", controller.CreatePractice)
 	e.POST("/company/:userId", controller.CreateCompany)
 	return e
-} //func NewServer(controller *controller.OwnerController) *http.ServeMux {
+}
+
+//func NewServer(controller *controller.OwnerController) *http.ServeMux {
 //	mux := http.NewServeMux()
 //	mux.HandleFunc("/practices", func(w http.ResponseWriter, req *http.Request) {
 //		switch req.Method {

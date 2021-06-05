@@ -40,7 +40,8 @@ func (oc *OwnerController) CreatePractice(c echo.Context) (err error) {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusCreated, practice)
+	c.JSON(http.StatusCreated, practice)
+	return
 }
 
 func (oc *OwnerController) CreateCompany(c echo.Context) (err error) {
@@ -61,6 +62,6 @@ func (oc *OwnerController) CreateCompany(c echo.Context) (err error) {
 	company := *entity.NewCompany(mapperCompany.id, userId, mapperCompany.statusId, mapperCompany.name, mapperCompany.detail)
 	fmt.Println(company)
 	//TODO: commandでcompanyを作成。
-	return c.JSON(http.StatusOK, "ok")
-
+	c.JSON(http.StatusOK, "ok")
+	return
 }
