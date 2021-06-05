@@ -62,7 +62,6 @@ func (oc *OwnerController) CreateCompany(c echo.Context) (err error) {
 	}
 
 	company := *entity.NewCompany(0, userId, mapperCompany.StatusId, mapperCompany.Name, mapperCompany.Detail)
-	fmt.Println(company.Name)
 	err = oc.createCompanyUseCase.Invoke(company)
 	return c.JSON(http.StatusCreated, company)
 }
