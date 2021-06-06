@@ -14,8 +14,12 @@ type Mysql struct {
 
 func NewMysql() (*Mysql, error) {
 	sql := new(Mysql)
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST_NAME"), os.Getenv("MYSQL_DATABASE"))
-	fmt.Println(dsn)
+	var dsn string
+	if os.Getenv("MYSQL_HOST_NAME") != "" {
+		dsn = fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST_NAME"), os.Getenv("MYSQL_DATABASE"))
+	} else {
+		dsn = fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), "localhost", os.Getenv("MYSQL_DATABASE"))
+	}
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
 		fmt.Println(err)
