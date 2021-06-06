@@ -1,9 +1,10 @@
-package controller
+package controller_test
 
 import (
 	"awesomeProject/src/app/infrastructure"
 	"awesomeProject/src/app/infrastructure/repository"
 	"awesomeProject/src/app/presentation"
+	controller2 "awesomeProject/src/app/presentation/controller"
 	"awesomeProject/src/app/usecase/command"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
@@ -18,23 +19,25 @@ func TestOwnerController_CreatePractice(t *testing.T) {
 	assert.Error(t, err)
 	prepo := repository.NewPracticeRepository(*mysql)
 	prusecase := *command.NewCreatePracticeUseCase(prepo)
-	controller := NewOwnerController(prusecase)
-	lineController := NewLineController()
+	crepo := repository.NewCompanyRepository(*mysql)
+	ccuc := *command.NewCreateCompanyUseCase(crepo)
+	controller := controller2.NewOwnerController(prusecase, ccuc)
+	lineController := controller2.NewLineController()
 	e := presentation.NewEchoRouter(controller, lineController)
 
 	tests := []struct {
 		name         string
-		practice     PracticeMapper
+		practice     controller2.PracticeMapper
 		responseCode int
 	}{
 		{
 			name:         "path this test",
-			practice:     PracticeMapper{Name: "Test", Age: 20},
+			practice:     controller2.PracticeMapper{Name: "Test", Age: 20},
 			responseCode: http.StatusCreated,
 		},
 		{
 			name:         "unable to path this test",
-			practice:     PracticeMapper{Name: "Test rejection", Age: 21},
+			practice:     controller2.PracticeMapper{Name: "Test rejection", Age: 21},
 			responseCode: http.StatusBadRequest,
 		},
 	}

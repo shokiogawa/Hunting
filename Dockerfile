@@ -6,7 +6,7 @@ COPY src/app ./src/app
 COPY go.mod .
 
 RUN apk add --no-cache git \
-  && go get github.com/oxequa/realize
+  && go get github.com/oxequa/realize && go mod tidy
 
 
 WORKDIR /go/awesomeProject/src/app
