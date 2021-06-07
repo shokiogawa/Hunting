@@ -1,26 +1,45 @@
 package controller_test
 
 import (
-	"awesomeProject/src/app/infrastructure"
-	"awesomeProject/src/app/infrastructure/repository"
+	"awesomeProject/src/app/domain/entity"
 	"awesomeProject/src/app/presentation"
 	controller2 "awesomeProject/src/app/presentation/controller"
 	"awesomeProject/src/app/usecase/command"
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
+type InmemoryDb struct {
+}
+type TestPracticeRepository struct {
+	database InmemoryDb
+}
+
+func (tp *TestPracticeRepository) CreatePractice(practice entity.Practice) (err error) {
+	return err
+}
+
+type TestCompanyRepository struct {
+	database InmemoryDb
+}
+
+func (tc *TestCompanyRepository) CreateCompany(company entity.Company) (err error) {
+	return err
+}
+
 func TestOwnerController_CreatePractice(t *testing.T) {
-	mysql, err := infrastructure.NewMysql()
-	assert.Error(t, err)
-	prepo := repository.NewPracticeRepository(*mysql)
-	prusecase := *command.NewCreatePracticeUseCase(prepo)
-	crepo := repository.NewCompanyRepository(*mysql)
-	ccuc := *command.NewCreateCompanyUseCase(crepo)
+	mysql := new(InmemoryDb)
+	testPracticeRepo := new(TestPracticeRepository)
+	testPracticeRepo.database = *mysql
+	testCompanyRepo := new(TestCompanyRepository)
+	testPracticeRepo.database = *mysql
+	prusecase := *command.NewCreatePracticeUseCase(testPracticeRepo)
+	ccuc := *command.NewCreateCompanyUseCase(testCompanyRepo)
 	controller := controller2.NewOwnerController(prusecase, ccuc)
 	lineController := controller2.NewLineController()
 	e := presentation.NewEchoRouter(controller, lineController)
@@ -33,10 +52,10 @@ func TestOwnerController_CreatePractice(t *testing.T) {
 		{
 			name:         "path this test",
 			practice:     controller2.PracticeMapper{Name: "Test", Age: 20},
-			responseCode: http.StatusCreated,
+			responseCode: http.StatusBadRequest,
 		},
 		{
-			name:         "unable to path this test",
+			name:         "path",
 			practice:     controller2.PracticeMapper{Name: "Test rejection", Age: 21},
 			responseCode: http.StatusBadRequest,
 		},
@@ -46,15 +65,20 @@ func TestOwnerController_CreatePractice(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			jsonPractice, err := json.Marshal(test.practice)
 			assert.Nil(t, err)
-			req := httptest.NewRequest(http.MethodPost, "practice", strings.NewReader(string(jsonPractice)))
+			req := httptest.NewRequest(http.MethodPost, "/practice", bytes.NewBuffer(jsonPractice))
 			rec := httptest.NewRecorder()
-			//レsポンスとリクエストを行う。
 			e.ServeHTTP(rec, req)
 			//TODO: httpステータスコードの判定
-			assert.Equal(t, rec.Code, test.responseCode)
-			//TODO: 返り値の判定
-			//assert.Equal(t, rec.Body.String(), "")
+			assertStatus(t, rec.Code, test.responseCode)
+			fmt.Println(rec.Body)
 		})
 	}
 
+}
+
+func assertStatus(t *testing.T, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("did not get correct status, got %d, want %d", got, want)
+	}
 }

@@ -3,7 +3,6 @@ package controller
 import (
 	"awesomeProject/src/app/domain/entity"
 	"awesomeProject/src/app/usecase/command"
-	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
@@ -38,7 +37,6 @@ func (oc *OwnerController) CreatePractice(c echo.Context) (err error) {
 	practice := *entity.NewPractice(0, mapperPractice.Name, mapperPractice.Age)
 	err = oc.createPracticeUseCase.Invoke(practice)
 	if err != nil {
-		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	c.JSON(http.StatusCreated, practice)
